@@ -1,0 +1,19 @@
+# MATLAB
+*.asv
+*.autosave
+*.fig
+*.mat
+*.mlx
+*.slxc
+*.mex*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
