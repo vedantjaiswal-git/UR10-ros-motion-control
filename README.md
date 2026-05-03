@@ -1,62 +1,152 @@
-UR10 Robot Motion Control using ROS and MATLAB
+# UR10 Robot Motion Control using ROS and MATLAB
 
-Overview:
+## Overview
 
-This repository contains an implementation of motion planning and control for a UR10 industrial robotic manipulator using MATLAB and ROS. The project demonstrates a complete robotics control pipeline including inverse kinematics, trajectory generation, and execution in a Gazebo simulation environment.
-The system integrates MATLAB (Robotics System Toolbox) with ROS Noetic to communicate with a simulated UR10 robot. Motion execution is implemented using both ROS topic-based and action-based interfaces, allowing comparison between open-loop trajectory execution and feedback-driven control.
+This project implements kinematic modeling, inverse kinematics, and trajectory control of a UR10 robotic manipulator using ROS and MATLAB Robotics System Toolbox. The system integrates robot modeling via URDF, numerical inverse kinematics, and trajectory execution using both ROS topic and action interfaces. The simulation is performed in Gazebo with visualization in RViz.
 
-Objectives:
+The project demonstrates end-to-end robotic motion control including trajectory generation, execution, and real-time joint state monitoring.
 
-The main objectives of this project are:
+---
 
-1. Implementation of inverse kinematics for a 6-DOF robotic manipulator
-2. Development of joint-space trajectory planning methods
-3. Execution of robot motion in ROS Gazebo simulation
-4. Integration of MATLAB with ROS communication framework
-5. Comparison of topic-based and action-based trajectory control methods
-6. Real-time monitoring of joint states and velocities
-7. System Description
+## Objectives
 
-The system consists of three main components:
+The primary objectives of this project are:
 
-1. MATLAB Environment
-Used for inverse kinematics computation, trajectory generation, and ROS communication.
+* Implementation of inverse kinematics for a UR10 manipulator using MATLAB’s numerical IK solver.
+* Generation of joint-space trajectories for point-to-point and multi-waypoint motion.
+* Execution of trajectories using ROS topic-based and action-based interfaces.
+* Real-time subscription and logging of joint states and joint velocities.
+* Analysis of motion profiles including position and velocity continuity.
 
-2. ROS Framework
-Provides communication infrastructure using publishers, subscribers, and action servers.
+---
 
-3. Gazebo Simulation
-Simulates the UR10 robot in a physically realistic environment, including dynamics and joint controllers.
+## System Architecture
 
-Key Features:
+The system consists of the following components:
 
--UR10 robot simulation in Gazebo and RViz
--Numerical inverse kinematics using MATLAB Robotics Toolbox
--Point-to-point and multi-waypoint trajectory generation
--Quintic polynomial-based joint trajectory execution
--ROS topic-based trajectory control interface
--ROS action client-server implementation with feedback handling
--Real-time joint state acquisition and monitoring
+* MATLAB: Motion planning, inverse kinematics, and ROS communication.
+* ROS: Middleware for communication between nodes.
+* Gazebo: Physics-based simulation environment for UR10 robot.
+* RViz: Visualization of robot state and transformations.
+* UR10 URDF model: Robot kinematic and dynamic representation.
 
-Implementation Details:
+Communication is established through ROS publishers and subscribers, with trajectory commands sent via topic and action interfaces.
 
-The project is structured into the following stages:
+---
 
--Inverse kinematics computation for target end-effector poses
--Definition of joint-space trajectories with time parametrization
--Execution of trajectories using ROS trajectory controllers
--Monitoring of joint states via ROS subscribers
--Implementation of both blocking and non-blocking action-based control
--Visualization and analysis of joint position and velocity profiles
+## Features
 
-Technologies Used:
-MATLAB (Robotics System Toolbox)
-ROS Noetic
-Gazebo Simulator
-RViz
-UR10 URDF Model
+### Inverse Kinematics
 
-Author:
-Vedant Jaiswal
-M.Sc. Automation and Robotics
-TU Dortmund University
+A numerical inverse kinematics solver is used to compute joint configurations for a given end-effector pose. The solver minimizes pose error in position and orientation space using weighted least squares optimization.
+
+### Trajectory Generation
+
+Joint trajectories are generated using quintic polynomial interpolation ensuring continuity in position, velocity, and acceleration. The system supports:
+
+* Point-to-point motion
+* Multi-waypoint trajectories
+* Velocity-constrained waypoint transitions
+
+### ROS Topic Interface
+
+Trajectory commands are published to the following topic:
+
+/ur10/vel_based_pos_traj_controller/command
+
+This interface provides a fire-and-forget execution model without feedback monitoring.
+
+### ROS Action Interface
+
+Trajectory execution is also implemented using the ROS action server:
+
+/ur10/vel_based_pos_traj_controller/follow_joint_trajectory
+
+This interface provides execution feedback, goal status tracking, and result validation.
+
+### Real-Time Monitoring
+
+Joint state data is obtained via subscription to:
+
+/ur10/joint_states
+
+The system records:
+
+* Joint positions
+* Joint velocities
+* Execution timestamps
+
+---
+
+## Requirements
+
+### Software
+
+* MATLAB (Robotics System Toolbox)
+* ROS Noetic
+* Gazebo
+* RViz
+* Ubuntu 20.04 (or compatible ROS environment)
+
+### MATLAB Dependencies
+
+* Robotics System Toolbox
+* Navigation Toolbox (optional for extensions)
+
+---
+
+## Setup Instructions
+
+### 1. Start ROS and Gazebo Simulation
+
+```bash
+roslaunch ur_launch ur10_sim_gazebo.launch rqt:=false
+```
+
+### 2. Initialize ROS connection in MATLAB
+
+```matlab
+rosinit(<ROS_MASTER_IP>)
+```
+
+### 3. Run Main Control Script
+
+```matlab
+Final_UR10_Motion_Control
+```
+
+---
+
+## Results
+
+The system successfully demonstrates:
+
+* Accurate inverse kinematics solutions within workspace constraints
+* Smooth joint-space trajectory execution
+* Continuous velocity profiles during motion
+* Multi-waypoint trajectory tracking with intermediate stopping conditions
+* Reliable real-time synchronization between MATLAB and ROS simulation
+
+---
+
+## Notes
+
+* Topic-based control is non-blocking but lacks execution feedback.
+* Action-based control provides full lifecycle monitoring including goal status and feedback callbacks.
+* Velocity constraints at waypoints significantly affect trajectory smoothness.
+
+---
+
+## Future Improvements
+
+* Modularization into a MATLAB package structure
+* Integration with real UR10 hardware
+* Implementation of Cartesian-space trajectory planning
+* Addition of obstacle-aware motion planning
+* Performance benchmarking of IK convergence
+
+---
+
+## License
+
+This project is intended for academic and educational use. You may adapt it for research or portfolio purposes with appropriate attribution.
